@@ -1,26 +1,54 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <HeaderPart />
+  <div>
+    <router-view />
+  </div>
+  <FooterPart />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HeaderPart from "./components/HeaderPart.vue";
+import FooterPart from "./components/FooterPart.vue";
+import { store } from "./components/store";
+
+const getCookie = (name) => {
+  return document.cookie.split("; ").reduce((r, v) => {
+    const parts = v.split("=");
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+  }, "");
+}
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HeaderPart,
+    FooterPart,
+  },
+  data() {
+    return {
+      store
+    }
+  },
+  beforeMount() {
+    // check for a cookie
+    let data = getCookie("_site_data");
+
+    if(data !== "") {
+      let cookieData = JSON.parse(data);
+
+      // update store
+      store.token = cookieData.token.token;
+      store.user = {
+        id: cookieData.user.id,
+        first_name: cookieData.user.first_name,
+        last_name: cookieData.user.last_name,
+        email: cookieData.user.email,
+      }
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
